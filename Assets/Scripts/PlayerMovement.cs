@@ -55,74 +55,86 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (!movementLocked && !detained)
+        // check to see if unpaused
+        if(FindObjectOfType<PauseMenu>() == null)
         {
-            GetComponent<Rigidbody>().velocity = new Vector3(direction.x * speed, GetComponent<Rigidbody>().velocity.y, direction.y * speed);
+            if (!movementLocked && !detained)
+            {
+                GetComponent<Rigidbody>().velocity = new Vector3(direction.x * speed, GetComponent<Rigidbody>().velocity.y, direction.y * speed);
+            }
         }
     }
 
     public void Move(InputAction.CallbackContext context)
     {
-        if(context.started)
+        // ignore inputs if paused
+        if(FindObjectOfType<PauseMenu>() == null)
         {
-            // Debug.Log("started");
-        }
-        else if(context.performed)
-        {
-            // Debug.Log("performed");
-            direction = context.ReadValue<Vector2>();
-        }
-        else if(context.canceled)
-        {
-            // Debug.Log("canceled");
-            direction = Vector2.zero;
+            if(context.started)
+            {
+                // Debug.Log("started");
+            }
+            else if(context.performed)
+            {
+                // Debug.Log("performed");
+                direction = context.ReadValue<Vector2>();
+            }
+            else if(context.canceled)
+            {
+                // Debug.Log("canceled");
+                direction = Vector2.zero;
+            }
         }
     }
 
     public void Interact(InputAction.CallbackContext context)
     {
-        // TODO: reenable
-        // if (currentElement == null) return;
+        // ignore inputs if paused
+        if(FindObjectOfType<PauseMenu>() == null)
+        {
+            // TODO: reenable
+            // if (currentElement == null) return;
 
-        // // handling interact presses in an interact popup
-        // if (movementLocked)
-        // {
-        //     if (currentElement is LockedDoor)
-        //     {
-        //         if (context.started)
-        //         {
-        //             LockedDoor lockedDoor = (LockedDoor) currentElement;
-        //             lockedDoor.AttemptUnlock(gameObject);
-        //         }
-        //     }
-        //     if (currentElement is Cover)
-        //     {
-        //         if (context.started)
-        //         {
-        //             Cover cover = (Cover) currentElement;
-        //             cover.Reveal(gameObject);
-        //         }
-        //     }
-        // }
-        // // handling interact presses outside of popups
-        // else
-        // {
-        //     if (context.started)
-        //     {
-        //         // Debug.Log("started");
-        //         Debug.Log("interact pressed");
-        //         currentElement.Interact(gameObject);
-        //     }
-        //     else if (context.performed)
-        //     {
-        //         // Debug.Log("performed");
+            // // handling interact presses in an interact popup
+            // if (movementLocked)
+            // {
+            //     if (currentElement is LockedDoor)
+            //     {
+            //         if (context.started)
+            //         {
+            //             LockedDoor lockedDoor = (LockedDoor) currentElement;
+            //             lockedDoor.AttemptUnlock(gameObject);
+            //         }
+            //     }
+            //     if (currentElement is Cover)
+            //     {
+            //         if (context.started)
+            //         {
+            //             Cover cover = (Cover) currentElement;
+            //             cover.Reveal(gameObject);
+            //         }
+            //     }
+            // }
+            // // handling interact presses outside of popups
+            // else
+            // {
+            //     if (context.started)
+            //     {
+            //         // Debug.Log("started");
+            //         Debug.Log("interact pressed");
+            //         currentElement.Interact(gameObject);
+            //     }
+            //     else if (context.performed)
+            //     {
+            //         // Debug.Log("performed");
 
-        //     }
-        //     else if (context.canceled)
-        //     {
-        //         // Debug.Log("canceled");
-        //     }
-        // } 
+            //     }
+            //     else if (context.canceled)
+            //     {
+            //         // Debug.Log("canceled");
+            //     }
+            // } 
+        }
     }
 
     public int GetIndex()
