@@ -10,8 +10,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private Vector2 direction;
 
     // interaction details
-    // TODO: reenable
-    // private InteractableElement currentElement;
+    [SerializeField] private Interactable currentElement;
     private bool movementLocked;
     public bool MovementLocked
     {
@@ -36,21 +35,19 @@ public class PlayerMovement : MonoBehaviour
     // storing reference to the last interactable element that the player is close to
     private void OnTriggerEnter(Collider collision)
     {
-        // TODO: reenable
-        // if (collision.gameObject.GetComponent<InteractableElement>())
-        // {
-        //     currentElement = collision.gameObject.GetComponent<InteractableElement>();
-        // }
+        if (collision.gameObject.GetComponent<Interactable>())
+        {
+            currentElement = collision.gameObject.GetComponent<Interactable>();
+        }
     }
 
     // clearing references to objects if player gets too far away
     private void OnTriggerExit(Collider collision)
     {
-        // TODO: reenable
-        // if (collision.gameObject.GetComponent<InteractableElement>() == currentElement)
-        // {
-        //     currentElement = null;
-        // }
+        if (collision.gameObject.GetComponent<Interactable>() == currentElement)
+        {
+            currentElement = null;
+        }
     }
 
     private void FixedUpdate()
@@ -92,48 +89,47 @@ public class PlayerMovement : MonoBehaviour
         // ignore inputs if paused
         if(FindObjectOfType<PauseMenu>() == null)
         {
-            // TODO: reenable
-            // if (currentElement == null) return;
+            if (currentElement == null) return;
 
-            // // handling interact presses in an interact popup
-            // if (movementLocked)
-            // {
-            //     if (currentElement is LockedDoor)
-            //     {
-            //         if (context.started)
-            //         {
-            //             LockedDoor lockedDoor = (LockedDoor) currentElement;
-            //             lockedDoor.AttemptUnlock(gameObject);
-            //         }
-            //     }
-            //     if (currentElement is Cover)
-            //     {
-            //         if (context.started)
-            //         {
-            //             Cover cover = (Cover) currentElement;
-            //             cover.Reveal(gameObject);
-            //         }
-            //     }
-            // }
-            // // handling interact presses outside of popups
-            // else
-            // {
-            //     if (context.started)
-            //     {
-            //         // Debug.Log("started");
-            //         Debug.Log("interact pressed");
-            //         currentElement.Interact(gameObject);
-            //     }
-            //     else if (context.performed)
-            //     {
-            //         // Debug.Log("performed");
+            // handling interact presses in an interact popup
+            if (movementLocked)
+            {
+                if (currentElement is LockedDoor)
+                {
+                    if (context.started)
+                    {
+                        LockedDoor lockedDoor = (LockedDoor) currentElement;
+                        lockedDoor.AttemptUnlock(gameObject);
+                    }
+                }
+                //if (currentElement is Cover)
+                //{
+                //    if (context.started)
+                //    {
+                //        Cover cover = (Cover)currentElement;
+                //        cover.Reveal(gameObject);
+                //    }
+                //}
+            }
+            // handling interact presses outside of popups
+            else
+            {
+                if (context.started)
+                {
+                    // Debug.Log("started");
+                    Debug.Log("interact pressed");
+                    currentElement.Interact(gameObject);
+                }
+                else if (context.performed)
+                {
+                    // Debug.Log("performed");
 
-            //     }
-            //     else if (context.canceled)
-            //     {
-            //         // Debug.Log("canceled");
-            //     }
-            // } 
+                }
+                else if (context.canceled)
+                {
+                    // Debug.Log("canceled");
+                }
+            }
         }
     }
 
