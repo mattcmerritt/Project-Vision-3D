@@ -236,6 +236,22 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: d9d5feb5-8841-4abd-abc7-2c888a369b1b
     m_ActionName: Default/Pause[/XInputControllerWindows/start]
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 2128105048470956317}
+        m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
+        m_MethodName: TriggerCancel
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 7ddbcf67-b4e1-4516-8fdd-d107d31bc737
+    m_ActionName: Default/Cancel
   m_NeverAutoSwitchControlSchemes: 1
   m_DefaultControlScheme: Gamepad
   m_DefaultActionMap: Default

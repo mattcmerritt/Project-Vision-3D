@@ -65,6 +65,18 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    public void TriggerCancel(InputAction.CallbackContext context)
+    {
+        if (movement != null)
+        {
+            movement.Cancel(context);
+        }
+        else
+        {
+            AttachPlayer(); // failsafe if player not attached yet
+        }
+    }
+
     public void TriggerPause(InputAction.CallbackContext context)
     {
         if(context.started)
