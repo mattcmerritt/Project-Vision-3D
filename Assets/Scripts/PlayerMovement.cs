@@ -137,6 +137,19 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    public void Cancel(InputAction.CallbackContext context)
+    {
+        // ignore inputs if paused
+        if(FindObjectOfType<PauseMenu>() == null)
+        {
+            // TODO: implement
+            if(context.started)
+            {
+                Debug.Log("cancel triggered");
+            }
+        }
+    }
+
     public int GetIndex()
     {
         return index;
