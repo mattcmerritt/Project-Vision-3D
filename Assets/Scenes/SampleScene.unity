@@ -137,7 +137,7 @@ GameObject:
   - component: {fileID: 37223528}
   - component: {fileID: 37223527}
   m_Layer: 0
-  m_Name: Lockpicking Canvas
+  m_Name: Door Lockpicking Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -158,11 +158,11 @@ RectTransform:
   - {fileID: 245455690}
   - {fileID: 609427386}
   - {fileID: 486463367}
-  m_Father: {fileID: 349561173}
+  m_Father: {fileID: 1936141384}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0.7}
+  m_AnchoredPosition: {x: 0, y: 0.0333333}
   m_SizeDelta: {x: 1.5, y: 0.25}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &37223527
@@ -1084,9 +1084,7 @@ Transform:
   m_LocalPosition: {x: -6.45, y: 1.5, z: 0.1}
   m_LocalScale: {x: 2.7, y: 3, z: 0.1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 691856579}
-  - {fileID: 37223526}
+  m_Children: []
   m_Father: {fileID: 499179290}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &349561174
@@ -1101,6 +1099,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f517aa160a7e3d0449561bd3371e8cd6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  canvasParent: {fileID: 1936141383}
   interactUI: {fileID: 691856578}
   lockpickingUI: {fileID: 37223525}
   unlockHandleTransform: {fileID: 1224252485}
@@ -1617,6 +1616,7 @@ Transform:
   - {fileID: 1890902724}
   - {fileID: 227018029}
   - {fileID: 349561173}
+  - {fileID: 1936141384}
   - {fileID: 976374813}
   m_Father: {fileID: 1421260813}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1851,6 +1851,7 @@ Transform:
   - {fileID: 216118133}
   - {fileID: 123296453}
   - {fileID: 1353451753}
+  - {fileID: 731534035}
   - {fileID: 1010794512}
   m_Father: {fileID: 1421260813}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -2018,7 +2019,7 @@ GameObject:
   - component: {fileID: 691856581}
   - component: {fileID: 691856580}
   m_Layer: 0
-  m_Name: Interact Canvas
+  m_Name: Door Interact Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2038,11 +2039,11 @@ RectTransform:
   m_Children:
   - {fileID: 759400753}
   - {fileID: 108537139}
-  m_Father: {fileID: 349561173}
+  m_Father: {fileID: 1936141384}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0.7}
+  m_AnchoredPosition: {x: 0, y: 0.0333333}
   m_SizeDelta: {x: 1, y: 0.25}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &691856580
@@ -2108,6 +2109,39 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
+--- !u!1 &731534034
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 731534035}
+  m_Layer: 0
+  m_Name: Door Canvases
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &731534035
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 731534034}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 8.45, y: 3.5, z: 0.5}
+  m_LocalScale: {x: 2.7, y: 3, z: 0.1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1069038405}
+  - {fileID: 1473098761}
+  m_Father: {fileID: 664349871}
+  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
 --- !u!1 &759400752
 GameObject:
   m_ObjectHideFlags: 0
@@ -2989,18 +3023,18 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1069038404}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: -4}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1022049612}
   - {fileID: 222083144}
-  m_Father: {fileID: 1353451753}
+  m_Father: {fileID: 731534035}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0.7}
+  m_AnchoredPosition: {x: 0, y: 0.0333333}
   m_SizeDelta: {x: 1, y: 0.25}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1069038406
@@ -3280,9 +3314,7 @@ Transform:
   m_LocalPosition: {x: 8.45, y: 1.5, z: 0.1}
   m_LocalScale: {x: 2.7, y: 3, z: 0.1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1069038405}
-  - {fileID: 1473098761}
+  m_Children: []
   m_Father: {fileID: 664349871}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &1353451754
@@ -3368,6 +3400,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f517aa160a7e3d0449561bd3371e8cd6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  canvasParent: {fileID: 731534034}
   interactUI: {fileID: 1069038404}
   lockpickingUI: {fileID: 1473098760}
   unlockHandleTransform: {fileID: 1952419811}
@@ -3618,18 +3651,18 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1473098760}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: -4}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 551846522}
   - {fileID: 816851658}
   - {fileID: 1436207428}
-  m_Father: {fileID: 1353451753}
+  m_Father: {fileID: 731534035}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0.7}
+  m_AnchoredPosition: {x: 0, y: 0.0333333}
   m_SizeDelta: {x: 1.5, y: 0.25}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1473098762
@@ -4452,6 +4485,39 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1890902723}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1936141383
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1936141384}
+  m_Layer: 0
+  m_Name: Door Canvases
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1936141384
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1936141383}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: -6.45, y: 3.5, z: 0.5}
+  m_LocalScale: {x: 2.7, y: 3, z: 0.1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 691856579}
+  - {fileID: 37223526}
+  m_Father: {fileID: 499179290}
+  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
 --- !u!1 &1937451531
 GameObject:
   m_ObjectHideFlags: 0

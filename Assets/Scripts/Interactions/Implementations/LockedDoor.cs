@@ -5,7 +5,7 @@ using System;
 
 public class LockedDoor : LockedInteractable
 {
-    [SerializeField] private GameObject interactUI, lockpickingUI;
+    [SerializeField] private GameObject canvasParent, interactUI, lockpickingUI;
     [SerializeField] private RectTransform unlockHandleTransform, startHandleTransform, endHandleTransform;
     [SerializeField] private float failWindow, successWindow;
 
@@ -24,8 +24,8 @@ public class LockedDoor : LockedInteractable
         // set up the lockpicking UI with the proper spacing
         // TODO: reconfigure to make the success window always either the top or bottom of the wheel
         float totalDuration = failWindow + successWindow;
-        startHandleTransform.rotation = Quaternion.Euler(0, 0, 0);
-        endHandleTransform.rotation = Quaternion.Euler(0, 0, -failWindow / totalDuration * 360);
+        startHandleTransform.rotation = Quaternion.Euler(canvasParent.transform.eulerAngles.x, canvasParent.transform.eulerAngles.y, 0);
+        endHandleTransform.rotation = Quaternion.Euler(canvasParent.transform.eulerAngles.x, canvasParent.transform.eulerAngles.y, -failWindow / totalDuration * 360);
 
         // subscribe door to success action
         onSuccess += OpenDoor;
@@ -75,17 +75,17 @@ public class LockedDoor : LockedInteractable
         {
             unlockAllowed = false;
             elapsedTime += Time.deltaTime;
-            unlockHandleTransform.rotation = Quaternion.Euler(0, 0, -elapsedTime / totalDuration * 360);
+            unlockHandleTransform.rotation = Quaternion.Euler(canvasParent.transform.eulerAngles.x, canvasParent.transform.eulerAngles.y, -elapsedTime / totalDuration * 360);
             yield return null;
         }
         while (elapsedTime < totalDuration)
         {
             unlockAllowed = true;
             elapsedTime += Time.deltaTime;
-            unlockHandleTransform.rotation = Quaternion.Euler(0, 0, -elapsedTime / totalDuration * 360);
+            unlockHandleTransform.rotation = Quaternion.Euler(canvasParent.transform.eulerAngles.x, canvasParent.transform.eulerAngles.y, -elapsedTime / totalDuration * 360);
             yield return null;
         }
-        unlockHandleTransform.rotation = Quaternion.Euler(0, 0, 0);
+        unlockHandleTransform.rotation = Quaternion.Euler(canvasParent.transform.eulerAngles.x, canvasParent.transform.eulerAngles.y, 0);
 
         // repeat the cycle
         activeLockpickCycle = StartCoroutine(UnlockMinigameCycle());
