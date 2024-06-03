@@ -84,6 +84,7 @@ public class Enemy : MonoBehaviour
         {
             elapsedTime += Time.deltaTime;
             transform.position = Vector3.Lerp(startPosition, target, elapsedTime / duration);
+            transform.eulerAngles = new Vector3(90f, 0f, 0f);
             yield return null;
         }
 
