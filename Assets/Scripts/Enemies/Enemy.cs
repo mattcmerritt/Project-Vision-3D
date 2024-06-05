@@ -6,6 +6,7 @@ public class Enemy : MonoBehaviour
 {
     // motion details
     [SerializeField] private Waypoint currentWaypoint, previousWaypoint;
+    private Vector3 currentDirection = Vector3.right;
     private float speed = 5;
 
     // current motion reference
@@ -22,7 +23,7 @@ public class Enemy : MonoBehaviour
     private void Update()
     {
         // scanning in front of the enemies in the vision cone
-        RaycastHit[] hits = Physics.RaycastAll(transform.position + transform.forward * 0.5f, transform.forward, viewDistance);
+        RaycastHit[] hits = Physics.RaycastAll(transform.position + currentDirection * 0.5f, currentDirection, viewDistance);
 
         HashSet<PlayerMovement> playersDetainedThisCycle = new HashSet<PlayerMovement>();
         foreach (RaycastHit hit in hits)
@@ -54,6 +55,13 @@ public class Enemy : MonoBehaviour
         playersDetained = playersDetainedThisCycle;
     }
 
+    // DEBUG
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawLine(transform.position + currentDirection * 0.5f, transform.position + currentDirection * 0.5f + currentDirection * viewDistance);
+    }
+
     public void SetTargetWaypoint(Waypoint newWaypoint)
     {
         // do not allow moving to the same point
@@ -63,7 +71,7 @@ public class Enemy : MonoBehaviour
         currentWaypoint = newWaypoint;
 
         // calculate direction
-        transform.LookAt(newWaypoint.TrueLocation);
+        currentDirection = Vector3.Normalize(currentWaypoint.TrueLocation - previousWaypoint.TrueLocation);
 
         // move between positions using coroutine
         if (movementCoroutine != null)

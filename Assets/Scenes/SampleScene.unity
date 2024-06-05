@@ -260,7 +260,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 99ba77e3a7828fa4cabc0e315f4ed092, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentWaypoint: {fileID: 0}
+  currentWaypoint: {fileID: 746331343}
   previousWaypoint: {fileID: 0}
   visionConeObject: {fileID: 0}
 --- !u!54 &57649422
