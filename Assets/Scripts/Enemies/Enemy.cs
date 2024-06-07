@@ -14,7 +14,7 @@ public class Enemy : MonoBehaviour
 
     // vision cone details
     [SerializeField] private GameObject visionConeObject;
-    private float viewDistance = 5;
+    private float viewDistance = 15;
 
     // detained player details
     private HashSet<PlayerMovement> playersDetained = new HashSet<PlayerMovement>();
@@ -60,6 +60,13 @@ public class Enemy : MonoBehaviour
     {
         Gizmos.color = Color.red;
         Gizmos.DrawLine(transform.position + currentDirection * 0.5f, transform.position + currentDirection * 0.5f + currentDirection * viewDistance);
+
+        Gizmos.color = Color.green;
+        Vector3 angle1 = Quaternion.Euler(0, 30, 0) * currentDirection;
+        Vector3 angle2 = Quaternion.Euler(0, -30, 0) * currentDirection;
+
+        Gizmos.DrawLine(transform.position + angle1 * 0.5f, transform.position + angle1 * 0.5f + angle1 * viewDistance);
+        Gizmos.DrawLine(transform.position + angle2 * 0.5f, transform.position + angle2 * 0.5f + angle2 * viewDistance);
     }
 
     public void SetTargetWaypoint(Waypoint newWaypoint)
