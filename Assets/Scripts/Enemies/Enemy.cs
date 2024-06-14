@@ -22,8 +22,36 @@ public class Enemy : MonoBehaviour
     // detecting in front of the player
     private void Update()
     {
-        // scanning in front of the enemies in the vision cone
-        RaycastHit[] hits = Physics.RaycastAll(transform.position + currentDirection * 0.5f, currentDirection, viewDistance);
+        // vision cone detection
+        //  uses cross products to determine if the object falls between two lines
+        //  linear algebra is explained here: https://stackoverflow.com/questions/45766534/finding-cross-product-to-find-points-above-below-a-line-in-matplotlib
+        Collider[] nearbyObjects = Physics.OverlapSphere(transform.position, viewDistance);
+
+        foreach (Collider nearbyObject in nearbyObjects)
+        {
+            if (nearbyObject.name.Contains("Marker"))
+            {
+                Debug.Log("<color=blue>Collision: </color> Detected a marker in the detection radius.");
+
+                Vector3 upperAngle = Quaternion.Euler(0, 30, 0) * currentDirection;
+                Vector3 lowerAngle = Quaternion.Euler(0, -30, 0) * currentDirection;
+
+                Vector3 upperEndpoint = transform.position + upperAngle * viewDistance;
+                Vector3 lowerEndpoint = transform.position + lowerAngle * viewDistance;
+
+                float upperCross = LinearMath.Cross2D(nearbyObject.transform.position, transform.position, upperEndpoint);
+                float lowerCross = LinearMath.Cross2D(nearbyObject.transform.position, transform.position, lowerEndpoint);
+
+                if (upperCross < 0 && lowerCross > 0)
+                {
+                    Debug.Log("<color=blue>Collision: </color> Cross product indicates that the object is in the desired area.");
+                }
+            }
+        }
+
+
+        // scanning directly in front of the enemies
+        RaycastHit[] hits = Physics.RaycastAll(transform.position, currentDirection, viewDistance);
 
         HashSet<PlayerMovement> playersDetainedThisCycle = new HashSet<PlayerMovement>();
         foreach (RaycastHit hit in hits)
@@ -59,14 +87,17 @@ public class Enemy : MonoBehaviour
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
-        Gizmos.DrawLine(transform.position + currentDirection * 0.5f, transform.position + currentDirection * 0.5f + currentDirection * viewDistance);
+        Gizmos.DrawLine(transform.position, transform.position + currentDirection * viewDistance);
 
         Gizmos.color = Color.green;
         Vector3 angle1 = Quaternion.Euler(0, 30, 0) * currentDirection;
         Vector3 angle2 = Quaternion.Euler(0, -30, 0) * currentDirection;
 
-        Gizmos.DrawLine(transform.position + angle1 * 0.5f, transform.position + angle1 * 0.5f + angle1 * viewDistance);
-        Gizmos.DrawLine(transform.position + angle2 * 0.5f, transform.position + angle2 * 0.5f + angle2 * viewDistance);
+        Gizmos.DrawLine(transform.position, transform.position + angle1 * viewDistance);
+        Gizmos.DrawLine(transform.position, transform.position + angle2 * viewDistance);
+
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, viewDistance);
     }
 
     public void SetTargetWaypoint(Waypoint newWaypoint)
