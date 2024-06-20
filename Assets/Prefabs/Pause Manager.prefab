@@ -51,3 +51,8 @@ MonoBehaviour:
   ActivePauseMenu: {fileID: 0}
   RequireBothPlayerstoUnpause: 0
   ForcePause: 0
+  playerLayers:
+  - serializedVersion: 2
+    m_Bits: 64
+  - serializedVersion: 2
+    m_Bits: 128

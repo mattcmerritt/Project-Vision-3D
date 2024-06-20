@@ -1,3 +1,4 @@
+using Cinemachine;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -11,6 +12,8 @@ public class PauseManager : MonoBehaviour
 
     [SerializeField] private bool RequireBothPlayerstoUnpause;
     [SerializeField] private bool ForcePause;
+
+    [SerializeField] private List<LayerMask> playerLayers;
 
     private void Start()
     {
@@ -28,10 +31,20 @@ public class PauseManager : MonoBehaviour
                 if(p.playerIndex == 0)
                 {
                     P1 = p;
+                    //separate vcam layer code (have to convert bit to integer)
+                    int layerToAdd = (int)Mathf.Log(playerLayers[0].value, 2);
+                    //set the vcam component layer to THIS player. cull the other layer to prevent splitscreen acknowledging that camera.
+                    p.transform.GetComponentInChildren<CinemachineVirtualCamera>().gameObject.layer = layerToAdd;
+                    p.transform.GetComponentInChildren<Camera>().cullingMask |= 1 << layerToAdd;
                 }
                 else if(p.playerIndex == 1)
                 {
                     P2 = p;
+                    //separate vcam layer code (have to convert bit to integer)
+                    int layerToAdd = (int)Mathf.Log(playerLayers[1].value, 2);
+                    //set the vcam component layer to THIS player. cull the other layer to prevent splitscreen acknowledging that camera.
+                    p.transform.parent.GetComponentInChildren<CinemachineVirtualCamera>().gameObject.layer = layerToAdd;
+                    p.transform.parent.GetComponentInChildren<Camera>().cullingMask |= 1 << layerToAdd;
                 }
             }
         }
