@@ -253,7 +253,7 @@ MonoBehaviour:
     m_ActionId: 7ddbcf67-b4e1-4516-8fdd-d107d31bc737
     m_ActionName: Default/Cancel
   m_NeverAutoSwitchControlSchemes: 1
-  m_DefaultControlScheme: Gamepad
+  m_DefaultControlScheme: 
   m_DefaultActionMap: Default
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 5153788453621986791}
