@@ -33,9 +33,10 @@ public class PauseManager : MonoBehaviour
                     P1 = p;
                     //separate vcam layer code (have to convert bit to integer)
                     int layerToAdd = (int)Mathf.Log(playerLayers[0].value, 2);
+                    Debug.Log(layerToAdd);
                     //set the vcam component layer to THIS player. cull the other layer to prevent splitscreen acknowledging that camera.
-                    p.transform.GetComponentInChildren<CinemachineVirtualCamera>().gameObject.layer = layerToAdd;
-                    p.transform.GetComponentInChildren<Camera>().cullingMask |= 1 << layerToAdd;
+                    p.GetComponentInChildren<CinemachineVirtualCamera>().gameObject.layer = layerToAdd;
+                    p.GetComponentInChildren<Camera>().cullingMask |= 1 << layerToAdd;
                 }
                 else if(p.playerIndex == 1)
                 {
@@ -43,8 +44,8 @@ public class PauseManager : MonoBehaviour
                     //separate vcam layer code (have to convert bit to integer)
                     int layerToAdd = (int)Mathf.Log(playerLayers[1].value, 2);
                     //set the vcam component layer to THIS player. cull the other layer to prevent splitscreen acknowledging that camera.
-                    p.transform.parent.GetComponentInChildren<CinemachineVirtualCamera>().gameObject.layer = layerToAdd;
-                    p.transform.parent.GetComponentInChildren<Camera>().cullingMask |= 1 << layerToAdd;
+                    p.GetComponentInChildren<CinemachineVirtualCameraBase>().gameObject.layer = layerToAdd;
+                    p.GetComponentInChildren<Camera>().cullingMask |= 1 << layerToAdd;
                 }
             }
         }
