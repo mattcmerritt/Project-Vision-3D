@@ -4,11 +4,14 @@ using UnityEngine;
 
 public class Waypoint : MonoBehaviour
 {
-    // Reference for moving the enemy around
-    private Enemy parent;
-
     // Reference for the object that causes the enemy to walk to this point
-    [SerializeField] private Interactable triggerObject;
+    //  Likely useful to make the character face that direction
+    private Vector3 objectLocation;
+    public Vector3 ObjectLocation
+    {
+        get { return this.objectLocation; }
+        private set { this.objectLocation = value; }
+    }
 
     // The object's true world position
     private Vector3 trueLocation;
@@ -20,18 +23,8 @@ public class Waypoint : MonoBehaviour
 
     private void Start()
     {
-        parent = GetComponentInParent<Enemy>();
-
+        Interactable triggerObject = GetComponentInParent<Interactable>();
         TrueLocation = transform.position;
-
-        if (triggerObject)
-        {
-            triggerObject.onInteractedWith += IssueMoveCommand;
-        }
-    }
-
-    private void IssueMoveCommand()
-    {
-        parent.SetTargetWaypoint(this);
+        ObjectLocation = triggerObject.transform.position;
     }
 }

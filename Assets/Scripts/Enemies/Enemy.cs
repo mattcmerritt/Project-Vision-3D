@@ -1,23 +1,26 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class Enemy : MonoBehaviour
 {
     // motion details
+    [SerializeField] private NavMeshAgent navAgent;
     [SerializeField] private Waypoint currentWaypoint, previousWaypoint;
-    private Vector3 currentDirection = Vector3.right;
+    [SerializeField] private Vector3 currentDirection = Vector3.right;
     private float speed = 5;
-
-    // current motion reference
-    private Coroutine movementCoroutine;
+    private Coroutine waitForArrivalCoroutine;
 
     // vision cone details
-    [SerializeField] private GameObject visionConeObject;
     private float viewDistance = 15;
 
-    // detained player details
-    private HashSet<PlayerMovement> playersDetained = new HashSet<PlayerMovement>();
+    // detected objects
+    private HashSet<GameObject> detectedInteractables = new HashSet<GameObject>();
+
+    // suspicion and behaviour information
+    [SerializeField] private List<Suspicion> suspicions = new List<Suspicion>();
+    private Dictionary<Interactable, Coroutine> currentlySuspiciousActions = new Dictionary<Interactable, Coroutine>();
 
     // detecting in front of the player
     private void Update()
@@ -27,12 +30,14 @@ public class Enemy : MonoBehaviour
         //  linear algebra is explained here: https://stackoverflow.com/questions/45766534/finding-cross-product-to-find-points-above-below-a-line-in-matplotlib
         Collider[] nearbyObjects = Physics.OverlapSphere(transform.position, viewDistance);
 
+        // reset the currently observed objects
+        HashSet<GameObject> previouslyFound = detectedInteractables;
+        HashSet<GameObject> found = new HashSet<GameObject>();
+
         foreach (Collider nearbyObject in nearbyObjects)
         {
-            if (nearbyObject.name.Contains("Marker"))
+            if (nearbyObject.GetComponent<Interactable>())
             {
-                Debug.Log("<color=blue>Collision: </color> Detected a marker in the detection radius.");
-
                 Vector3 upperAngle = Quaternion.Euler(0, 30, 0) * currentDirection;
                 Vector3 lowerAngle = Quaternion.Euler(0, -30, 0) * currentDirection;
 
@@ -44,12 +49,35 @@ public class Enemy : MonoBehaviour
 
                 if (upperCross < 0 && lowerCross > 0)
                 {
-                    Debug.Log("<color=blue>Collision: </color> Cross product indicates that the object is in the desired area.");
+                    // check if the object was already seen
+                    if (found.Add(nearbyObject.gameObject))
+                    {
+                        Debug.Log($"<color=blue>Collision: </color> {nearbyObject.name} is seen by {gameObject.name}.");
+                    }
+                    else
+                    {
+                        Debug.Log($"<color=blue>Collision: </color> {nearbyObject.name} is still seen by {gameObject.name}.");
+                    }
                 }
             }
         }
 
+        // subscribe to the interaction trigger events for any observable interactions that were added this cycle
+        foreach (GameObject detectedObject in found)
+        {
+            if (!previouslyFound.Contains(detectedObject))
+            {
+                Interactable detectedInteractable = detectedObject.GetComponent<Interactable>();
+                detectedInteractable.onPlayerStartInteract += StartSuspiciousAction;
+                detectedInteractable.onPlayerStopInteract += CeaseSuspiciousAction;
+            }
+        }
 
+        // overwrite the list of detected interactables
+        detectedInteractables = found;
+
+        #region Player Detaining
+        /*
         // scanning directly in front of the enemies
         RaycastHit[] hits = Physics.RaycastAll(transform.position, currentDirection, viewDistance);
 
@@ -81,6 +109,8 @@ public class Enemy : MonoBehaviour
         }
         // setting the players detained to the players detained at the end of this frame
         playersDetained = playersDetainedThisCycle;
+        */
+        #endregion Player Detaining
     }
 
     // DEBUG
@@ -108,17 +138,55 @@ public class Enemy : MonoBehaviour
         previousWaypoint = currentWaypoint;
         currentWaypoint = newWaypoint;
 
-        // calculate direction
-        currentDirection = Vector3.Normalize(currentWaypoint.TrueLocation - previousWaypoint.TrueLocation);
-
-        // move between positions using coroutine
-        if (movementCoroutine != null)
-        {
-            StopCoroutine(movementCoroutine);
-        }
-        movementCoroutine = StartCoroutine(MoveToPosition(newWaypoint.TrueLocation));
+        // move between positions using nav agent
+        navAgent.SetDestination(currentWaypoint.TrueLocation);
+        waitForArrivalCoroutine = StartCoroutine(WaitToLookAtDestination(currentWaypoint));
     }
 
+    private IEnumerator WaitToLookAtDestination(Waypoint target)
+    {
+        while ((transform.position - target.TrueLocation).magnitude < 0.1f)
+        {
+            // calculate and adjust direction
+            currentDirection = Vector3.Normalize(target.TrueLocation - transform.position);
+            transform.LookAt(target.TrueLocation);
+
+            yield return null;
+        }
+
+        transform.LookAt(target.ObjectLocation);
+    }
+
+    private void StartSuspiciousAction(Interactable source)
+    {
+        currentlySuspiciousActions.Add(source, StartCoroutine(GrowSuspicion(source)));
+    }
+
+    private IEnumerator GrowSuspicion(Interactable source)
+    {
+        Suspicion associatedSuspicion = suspicions.Find((Suspicion s) => s.interactionType == source.interactionType);
+
+        while (associatedSuspicion != null && associatedSuspicion.currentLevel < associatedSuspicion.threshold)
+        {
+            associatedSuspicion.currentLevel += Time.deltaTime * associatedSuspicion.rateOfIncrease;
+            yield return null;
+        }
+
+        if (associatedSuspicion.currentLevel >= associatedSuspicion.threshold)
+        {
+            SetTargetWaypoint(source.waypoint);
+        }
+    }
+
+    private void CeaseSuspiciousAction(Interactable source)
+    {
+        currentlySuspiciousActions.TryGetValue(source, out Coroutine suspicionCoroutine);
+        StopCoroutine(suspicionCoroutine);
+        currentlySuspiciousActions.Remove(source);
+    }
+
+    #region Waypoint Movement (Old Interpolation)
+    /*
     private IEnumerator MoveToPosition(Vector3 target)
     {
         Vector3 startPosition = transform.position;
@@ -137,4 +205,6 @@ public class Enemy : MonoBehaviour
         // move the enemy exactly to the end
         transform.position = target;
     }
+    */
+    #endregion Waypoint Movement (Old Interpolation)
 }
