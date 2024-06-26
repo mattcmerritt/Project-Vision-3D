@@ -18,4 +18,20 @@ public class LinearMath : MonoBehaviour
 
         return cross.z;
     }
+
+    // Method to calculate the 2D distance between two points, flattened from 3D onto the XZ plane
+    public static float Distance2D(Vector3 start, Vector3 end)
+    {
+        Vector3 leveledStart = new Vector3(start.x, 0f, start.z);
+        Vector3 leveledEnd = new Vector3(end.x, 0f, end.z);
+
+        return (leveledEnd - leveledStart).magnitude;
+    }
+
+    // Method to move a point on level with another point on the XZ plane.
+    // Used for rotation purposes, effectively just adjusts the Y position of the second point to match the first points height.
+    public static Vector3 GetSameHeightPoint(Vector3 desiredLocation, Vector3 targetLocation)
+    {
+        return new Vector3(targetLocation.x, desiredLocation.y, targetLocation.z);
+    }
 }

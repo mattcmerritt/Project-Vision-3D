@@ -8,7 +8,6 @@ public class Enemy : MonoBehaviour
     // motion details
     [SerializeField] private NavMeshAgent navAgent;
     [SerializeField] private Waypoint currentWaypoint, previousWaypoint;
-    [SerializeField] private Vector3 currentDirection = Vector3.right;
     private float speed = 5;
     private Coroutine waitForArrivalCoroutine;
 
@@ -36,10 +35,12 @@ public class Enemy : MonoBehaviour
 
         foreach (Collider nearbyObject in nearbyObjects)
         {
+            if (!nearbyObject.isTrigger) continue;
+
             if (nearbyObject.GetComponent<Interactable>())
             {
-                Vector3 upperAngle = Quaternion.Euler(0, 30, 0) * currentDirection;
-                Vector3 lowerAngle = Quaternion.Euler(0, -30, 0) * currentDirection;
+                Vector3 upperAngle = Quaternion.Euler(0, 30, 0) * transform.forward;
+                Vector3 lowerAngle = Quaternion.Euler(0, -30, 0) * transform.forward;
 
                 Vector3 upperEndpoint = transform.position + upperAngle * viewDistance;
                 Vector3 lowerEndpoint = transform.position + lowerAngle * viewDistance;
@@ -50,14 +51,8 @@ public class Enemy : MonoBehaviour
                 if (upperCross < 0 && lowerCross > 0)
                 {
                     // check if the object was already seen
-                    if (found.Add(nearbyObject.gameObject))
-                    {
-                        Debug.Log($"<color=blue>Collision: </color> {nearbyObject.name} is seen by {gameObject.name}.");
-                    }
-                    else
-                    {
-                        Debug.Log($"<color=blue>Collision: </color> {nearbyObject.name} is still seen by {gameObject.name}.");
-                    }
+                    found.Add(nearbyObject.gameObject);
+                    Debug.Log($"<color=blue>Collision: </color> {nearbyObject.name} is seen by {gameObject.name}.");
                 }
             }
         }
@@ -117,17 +112,27 @@ public class Enemy : MonoBehaviour
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
-        Gizmos.DrawLine(transform.position, transform.position + currentDirection * viewDistance);
+        Gizmos.DrawLine(transform.position, transform.position + transform.forward * viewDistance);
 
         Gizmos.color = Color.green;
-        Vector3 angle1 = Quaternion.Euler(0, 30, 0) * currentDirection;
-        Vector3 angle2 = Quaternion.Euler(0, -30, 0) * currentDirection;
+        Vector3 angle1 = Quaternion.Euler(0, 30, 0) * transform.forward;
+        Vector3 angle2 = Quaternion.Euler(0, -30, 0) * transform.forward;
 
         Gizmos.DrawLine(transform.position, transform.position + angle1 * viewDistance);
         Gizmos.DrawLine(transform.position, transform.position + angle2 * viewDistance);
 
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, viewDistance);
+
+        // DIRECTIONAL TESTS
+        Gizmos.color = Color.blue;
+        Gizmos.DrawSphere(transform.position + transform.forward, 0.25f);
+
+        Gizmos.color = Color.red;
+        Gizmos.DrawSphere(transform.position + transform.right, 0.25f);
+        
+        Gizmos.color = Color.green;
+        Gizmos.DrawSphere(transform.position + transform.up, 0.25f);
     }
 
     public void SetTargetWaypoint(Waypoint newWaypoint)
@@ -139,22 +144,18 @@ public class Enemy : MonoBehaviour
         currentWaypoint = newWaypoint;
 
         // move between positions using nav agent
-        navAgent.SetDestination(currentWaypoint.TrueLocation);
+        navAgent.SetDestination(LinearMath.GetSameHeightPoint(transform.position, currentWaypoint.TrueLocation));
         waitForArrivalCoroutine = StartCoroutine(WaitToLookAtDestination(currentWaypoint));
     }
 
     private IEnumerator WaitToLookAtDestination(Waypoint target)
     {
-        while ((transform.position - target.TrueLocation).magnitude < 0.1f)
+        // while in motion, look at the target object
+        while (navAgent.remainingDistance > 0f)
         {
-            // calculate and adjust direction
-            currentDirection = Vector3.Normalize(target.TrueLocation - transform.position);
-            transform.LookAt(target.TrueLocation);
-
+            transform.LookAt(LinearMath.GetSameHeightPoint(transform.position, target.ObjectLocation));
             yield return null;
         }
-
-        transform.LookAt(target.ObjectLocation);
     }
 
     private void StartSuspiciousAction(Interactable source)
