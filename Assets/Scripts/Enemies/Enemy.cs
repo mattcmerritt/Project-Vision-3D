@@ -8,7 +8,6 @@ public class Enemy : MonoBehaviour
     // motion details
     [SerializeField] private NavMeshAgent navAgent;
     [SerializeField] private Waypoint currentWaypoint, previousWaypoint;
-    private float speed = 5;
     private Coroutine waitForArrivalCoroutine;
 
     // vision cone details
@@ -21,10 +20,22 @@ public class Enemy : MonoBehaviour
     [SerializeField] private List<Suspicion> suspicions = new List<Suspicion>();
     private Dictionary<Interactable, Coroutine> currentlySuspiciousActions = new Dictionary<Interactable, Coroutine>();
 
+    // patrolling and passive movement information
+    [SerializeField] private PathingMap pathingMap;
+    private PathingNode currentPathingStep;
+    private float timeSpentInPathingStep;
+    private bool isCurrentlyUsingPathingMap = true;
+
+    private void Start()
+    {
+        pathingMap.Initialize();
+        currentPathingStep = pathingMap.GetCurrentPathingNode();
+    }
+
     // detecting in front of the player
     private void Update()
     {
-        // vision cone detection
+        #region Vision Cone Detection
         //  uses cross products to determine if the object falls between two lines
         //  linear algebra is explained here: https://stackoverflow.com/questions/45766534/finding-cross-product-to-find-points-above-below-a-line-in-matplotlib
         Collider[] nearbyObjects = Physics.OverlapSphere(transform.position, viewDistance);
@@ -70,42 +81,21 @@ public class Enemy : MonoBehaviour
 
         // overwrite the list of detected interactables
         detectedInteractables = found;
+        #endregion Vision Cone Detection
 
-        #region Player Detaining
-        /*
-        // scanning directly in front of the enemies
-        RaycastHit[] hits = Physics.RaycastAll(transform.position, currentDirection, viewDistance);
-
-        HashSet<PlayerMovement> playersDetainedThisCycle = new HashSet<PlayerMovement>();
-        foreach (RaycastHit hit in hits)
+        #region Pathing Map Updates
+        if (isCurrentlyUsingPathingMap)
         {
-            if (hit.collider.GetComponent<PlayerMovement>() && !hit.collider.GetComponent<PlayerMovement>().Hidden)
+            timeSpentInPathingStep += Time.deltaTime;
+            if (timeSpentInPathingStep > currentPathingStep.WaitTime)
             {
-                // previously would restart the level on being caught
-                // GameManager.instance.FailAndRestartLevel();
+                currentPathingStep = pathingMap.GetNextPathingNode();
+                timeSpentInPathingStep = 0f;
 
-                // now, the player is held in place and cannot move
-                playersDetainedThisCycle.Add(hit.collider.GetComponent<PlayerMovement>());
+                SetTargetWaypoint(currentPathingStep.Waypoint, false);
             }
         }
-
-        // detaining all caught players to restrict movement
-        foreach (PlayerMovement player in playersDetainedThisCycle)
-        {
-            player.Detained = true;
-        }
-        // releasing any players from last cycle that were not detained this cycle
-        foreach (PlayerMovement player in playersDetained)
-        {
-            if (!playersDetainedThisCycle.Contains(player))
-            {
-                player.Detained = false;
-            }
-        }
-        // setting the players detained to the players detained at the end of this frame
-        playersDetained = playersDetainedThisCycle;
-        */
-        #endregion Player Detaining
+        #endregion Pathing Map Updates
     }
 
     // DEBUG
@@ -135,7 +125,7 @@ public class Enemy : MonoBehaviour
         Gizmos.DrawSphere(transform.position + transform.up, 0.25f);
     }
 
-    public void SetTargetWaypoint(Waypoint newWaypoint)
+    public void SetTargetWaypoint(Waypoint newWaypoint, bool isDistraction)
     {
         // do not allow moving to the same point
         if (newWaypoint == currentWaypoint) return;
@@ -145,10 +135,10 @@ public class Enemy : MonoBehaviour
 
         // move between positions using nav agent
         navAgent.SetDestination(LinearMath.GetSameHeightPoint(transform.position, currentWaypoint.TrueLocation));
-        waitForArrivalCoroutine = StartCoroutine(WaitToLookAtDestination(currentWaypoint));
+        waitForArrivalCoroutine = StartCoroutine(WaitToLookAtDestination(currentWaypoint, isDistraction));
     }
 
-    private IEnumerator WaitToLookAtDestination(Waypoint target)
+    private IEnumerator WaitToLookAtDestination(Waypoint target, bool isDistraction)
     {
         // while in motion, look at the target object
         while (navAgent.remainingDistance > 0f)
@@ -156,6 +146,26 @@ public class Enemy : MonoBehaviour
             transform.LookAt(LinearMath.GetSameHeightPoint(transform.position, target.ObjectLocation));
             yield return null;
         }
+
+        // if this is a distraction from an interactable, the enemy needs to return to standard pathing
+        if (isDistraction)
+        {
+            StartCoroutine(ReturnToPathingMap());
+        }
+        // otherwise, once the enemy is back at their waypoint, mark as still using the navigation map
+        else
+        {
+            isCurrentlyUsingPathingMap = true;
+        }
+    }
+
+    private IEnumerator ReturnToPathingMap()
+    {
+        // wait a delay before returning to the standard behavior
+        yield return new WaitForSeconds(3);
+
+        // set the player back on their original path
+        SetTargetWaypoint(currentPathingStep.Waypoint, false);
     }
 
     private void StartSuspiciousAction(Interactable source)
@@ -175,7 +185,8 @@ public class Enemy : MonoBehaviour
 
         if (associatedSuspicion.currentLevel >= associatedSuspicion.threshold)
         {
-            SetTargetWaypoint(source.waypoint);
+            isCurrentlyUsingPathingMap = false;
+            SetTargetWaypoint(source.waypoint, true);
         }
     }
 
