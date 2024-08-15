@@ -25,6 +25,7 @@ public class Enemy : MonoBehaviour
     private PathingNode currentPathingStep;
     private float timeSpentInPathingStep;
     private bool isCurrentlyUsingPathingMap = true;
+    private bool isCurrentlyMoving = false;
 
     private void Start()
     {
@@ -84,7 +85,7 @@ public class Enemy : MonoBehaviour
         #endregion Vision Cone Detection
 
         #region Pathing Map Updates
-        if (isCurrentlyUsingPathingMap)
+        if (isCurrentlyUsingPathingMap && !isCurrentlyMoving)
         {
             timeSpentInPathingStep += Time.deltaTime;
             if (timeSpentInPathingStep > currentPathingStep.WaitTime)
@@ -130,6 +131,10 @@ public class Enemy : MonoBehaviour
         // do not allow moving to the same point
         if (newWaypoint == currentWaypoint) return;
 
+        // indicate that the player is in motion now
+        isCurrentlyMoving = true;
+
+        // update waypoints
         previousWaypoint = currentWaypoint;
         currentWaypoint = newWaypoint;
 
@@ -147,6 +152,10 @@ public class Enemy : MonoBehaviour
             yield return null;
         }
 
+        // TODO: determine if this is the best way of doing this:
+        //  it could be clearer to do this in update around where the waiting occurs
+        //  current design forces a hard-coded wait, when the wait could be attached to the waypoint instead
+
         // if this is a distraction from an interactable, the enemy needs to return to standard pathing
         if (isDistraction)
         {
@@ -157,6 +166,9 @@ public class Enemy : MonoBehaviour
         {
             isCurrentlyUsingPathingMap = true;
         }
+
+        // indicate that the player is now waiting and not moving for counter
+        isCurrentlyMoving = false;
     }
 
     private IEnumerator ReturnToPathingMap()
