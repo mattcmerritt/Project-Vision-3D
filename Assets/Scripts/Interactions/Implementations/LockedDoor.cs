@@ -19,8 +19,14 @@ public class LockedDoor : LockedInteractable
     // action callbacks to detect successes and failures
     public Action onSuccess, onFailure;
 
-    private void Start()
+    protected override void Start()
     {
+        // waypoint set up
+        base.Start();
+
+        // configure the type of the interaction
+        interactionType = InteractionTypes.Lockpicking;
+
         // set up the lockpicking UI with the proper spacing
         // TODO: reconfigure to make the success window always either the top or bottom of the wheel
         float totalDuration = failWindow + successWindow;

@@ -8,18 +8,31 @@ public abstract class Interactable : MonoBehaviour
     // tracking if players are near the object
     private HashSet<GameObject> playersClose = new HashSet<GameObject>();
 
-    // action callback to allow enemies to listen for changes
-    public Action onInteractedWith;
+    // adding a interaction type to group this interaction by for suspicion purposes
+    public InteractionTypes interactionType { get; protected set; }
+
+    // events for enemies to latch onto when in detection range
+    public Action<Interactable> onPlayerStartInteract, onPlayerStopInteract;
+
+    // waypoint information for enemies that are suspicious of this interaction
+    public Waypoint waypoint { get; private set; }
+
+    // fetch the waypoint for enemy navigation
+    protected virtual void Start()
+    {
+        waypoint = GetComponentInChildren<Waypoint>();
+    }
 
     public virtual void Interact(GameObject player)
     {
         InteractBehaviour(player);
-        onInteractedWith?.Invoke();
+        onPlayerStartInteract?.Invoke(this);
     }
 
     public virtual void StopInteract(GameObject player)
     {
         StopInteractBehaviour(player);
+        onPlayerStopInteract?.Invoke(this);
     }
 
     public abstract void InteractBehaviour(GameObject player);
